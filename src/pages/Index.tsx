@@ -64,7 +64,7 @@ const Index = () => {
       <div className="text-center mb-10">
         <h1 className="text-4xl font-bold mb-4">The Anxious Display</h1>
         <p className="text-xl text-muted-foreground mb-6">
-          A simple web app to keep track of the deadlines you'd like to ignore
+          Track of the deadlines you'd like to ignore
         </p>
         <CountdownForm 
           onAddCountdown={handleAddCountdown}
