@@ -6,6 +6,7 @@ import CountdownForm from "@/components/CountdownForm";
 import CountdownList from "@/components/CountdownList";
 import { Countdown } from "@/types/countdown";
 import { GitHubIcon } from '@/components/icons/github';
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const [countdowns, setCountdowns] = useState<Countdown[]>([]);
@@ -64,9 +65,10 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <header className="border-b">
-        <div className="container max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-end">
+        <div className="container max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-end gap-2">
+          <ThemeToggle />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
