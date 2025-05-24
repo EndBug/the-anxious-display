@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import CountdownForm from "@/components/CountdownForm";
 import CountdownList from "@/components/CountdownList";
 import { Countdown } from "@/types/countdown";
+import { GitHubIcon } from '@/components/icons/github';
 
 const Index = () => {
   const [countdowns, setCountdowns] = useState<Countdown[]>([]);
@@ -60,33 +63,65 @@ const Index = () => {
     setCountdowns(reorderedCountdowns);
   };
 
-  return <div className="container max-w-6xl mx-auto py-8 px-4 sm:px-6">
-      <div className="text-center mb-10">
-        <h1 className="text-4xl font-bold mb-4">The Anxious Display</h1>
-        <p className="text-xl text-muted-foreground mb-6">
-          Track of the deadlines you'd like to ignore
-        </p>
-        <CountdownForm 
-          onAddCountdown={handleAddCountdown}
-          onUpdateCountdown={handleUpdateCountdown}
-          countdownToEdit={countdownToEdit}
-          open={isFormOpen} 
-          onOpenChange={(open) => {
-            setIsFormOpen(open);
-            if (!open) setCountdownToEdit(null);
-          }}
-        />
-      </div>
+  return (
+    <div className="min-h-screen flex flex-col">
+      <header className="border-b">
+        <div className="container max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-end">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  asChild
+                >
+                  <a
+                    href="https://github.com/EndBug/the-anxious-display"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="View on GitHub"
+                  >
+                    <GitHubIcon className="size-5" />
+                  </a>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>GitHub repo</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      </header>
 
-      <div className="mt-10">
-        <CountdownList 
-          countdowns={countdowns} 
-          onDelete={handleDeleteCountdown}
-          onEdit={handleEditCountdown}
-          onReorder={handleReorderCountdowns}
-        />
-      </div>
-    </div>;
+      <main className="flex-1 container max-w-6xl mx-auto py-8 px-4 sm:px-6">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl font-bold mb-4">The Anxious Display</h1>
+          <p className="text-xl text-muted-foreground mb-6">
+            Track of the deadlines you'd like to ignore
+          </p>
+          <CountdownForm 
+            onAddCountdown={handleAddCountdown}
+            onUpdateCountdown={handleUpdateCountdown}
+            countdownToEdit={countdownToEdit}
+            open={isFormOpen} 
+            onOpenChange={(open) => {
+              setIsFormOpen(open);
+              if (!open) setCountdownToEdit(null);
+            }}
+          />
+        </div>
+
+        <div className="mt-10">
+          <CountdownList 
+            countdowns={countdowns} 
+            onDelete={handleDeleteCountdown}
+            onEdit={handleEditCountdown}
+            onReorder={handleReorderCountdowns}
+          />
+        </div>
+      </main>
+    </div>
+  );
 };
 
 export default Index;
