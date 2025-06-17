@@ -7,7 +7,10 @@ import CountdownList from "@/components/CountdownList";
 import { Countdown } from "@/types/countdown";
 import { GitHubIcon } from '@/components/icons/github';
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Filter, SortDesc } from "lucide-react";
+import { Filter, SortDesc, Share2, Clipboard } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { QRCodeCanvas } from "qrcode.react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const Index = () => {
   const [countdowns, setCountdowns] = useState<Countdown[]>([]);
@@ -15,6 +18,7 @@ const Index = () => {
   const [countdownToEdit, setCountdownToEdit] = useState<Countdown | null>(null);
   const [isSortedByTime, setIsSortedByTime] = useState(false);
   const [isFilteringCompleted, setIsFilteringCompleted] = useState(false);
+  const [searchParams] = useSearchParams();
 
   // Load countdowns from local storage on initial render
   useEffect(() => {
@@ -34,10 +38,38 @@ const Index = () => {
     localStorage.setItem("countdowns", JSON.stringify(countdowns));
   }, [countdowns]);
 
+  // Parse query parameters and add countdown if valid parameters are detected
+  useEffect(() => {
+    const title = searchParams.get("title");
+    const targetDate = searchParams.get("date");
+    const description = searchParams.get("description");
+
+    if (title && targetDate) {
+      const newCountdown = {
+        title,
+        targetDate,
+        description: description || "",
+      };
+      handleAddCountdown(newCountdown);
+      toast.success("Countdown added from URL!");
+      searchParams.delete("title");
+      searchParams.delete("date");
+      searchParams.delete("description");
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [searchParams]);
+
+  const generateUUID = () => {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) {
+      return crypto.randomUUID();
+    }
+    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+  };
+
   const handleAddCountdown = (newCountdown: Omit<Countdown, "id">) => {
     const countdown: Countdown = {
       ...newCountdown,
-      id: crypto.randomUUID()
+      id: generateUUID()
     };
     setCountdowns(prev => [...prev, countdown]);
     toast.success("Countdown added successfully!");
@@ -75,6 +107,56 @@ const Index = () => {
     setIsFilteringCompleted((prev) => !prev);
   };
 
+  const generateShareableUrl = () => {
+    const countdownsToShare = countdowns.map(({ title, targetDate, description }) => ({
+      title,
+      date: targetDate,
+      description,
+    }));
+    const url = new URL(window.location.href);
+    const encodedCountdowns = btoa(encodeURIComponent(JSON.stringify(countdownsToShare))); // Base64 encode with URI encoding
+    url.searchParams.set("countdowns", encodedCountdowns);
+    return url.toString();
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard!");
+  };
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const countdownsParam = searchParams.get("countdowns");
+
+    if (countdownsParam) {
+      try {
+        console.log("Raw countdownsParam:", countdownsParam); // Debugging log
+        const decodedString = decodeURIComponent(atob(countdownsParam)); // Decode base64 and URI
+        console.log("Decoded string:", decodedString); // Debugging log
+        const decodedCountdowns = JSON.parse(decodedString); // Parse JSON
+        if (Array.isArray(decodedCountdowns)) {
+          decodedCountdowns.forEach((countdown) => {
+            const { title, date, description } = countdown;
+            if (title && date) {
+              handleAddCountdown({
+                title,
+                targetDate: date,
+                description: description || "",
+              });
+            }
+          });
+          toast.success("Countdowns added from URL!");
+        }
+      } catch (error) {
+        console.error("Failed to parse countdowns from URL", error);
+        toast.error("Invalid countdowns parameter: "+ error.message);
+      }
+
+      searchParams.delete("countdowns");
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="border-b">
@@ -96,6 +178,37 @@ const Index = () => {
           >
             <Filter className={isFilteringCompleted ? "text-primary" : ""} />
           </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Share Countdowns">
+                <Share2 />
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Share Countdowns</DialogTitle>
+              </DialogHeader>
+              <div className="flex flex-col items-center gap-4">
+                <QRCodeCanvas value={generateShareableUrl()} size={200} />
+                <div className="flex flex-col items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={generateShareableUrl()}
+                    className="w-full p-2 border rounded text-sm text-muted-foreground"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => copyToClipboard(generateShareableUrl())}
+                    aria-label="Copy to Clipboard"
+                  >
+                    <Clipboard />
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
