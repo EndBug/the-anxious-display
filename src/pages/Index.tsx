@@ -7,11 +7,14 @@ import CountdownList from "@/components/CountdownList";
 import { Countdown } from "@/types/countdown";
 import { GitHubIcon } from '@/components/icons/github';
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Filter, SortDesc } from "lucide-react";
 
 const Index = () => {
   const [countdowns, setCountdowns] = useState<Countdown[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [countdownToEdit, setCountdownToEdit] = useState<Countdown | null>(null);
+  const [isSortedByTime, setIsSortedByTime] = useState(false);
+  const [isFilteringCompleted, setIsFilteringCompleted] = useState(false);
 
   // Load countdowns from local storage on initial render
   useEffect(() => {
@@ -64,11 +67,35 @@ const Index = () => {
     setCountdowns(reorderedCountdowns);
   };
 
+  const handleToggleSort = () => {
+    setIsSortedByTime((prev) => !prev);
+  };
+
+  const handleToggleFilter = () => {
+    setIsFilteringCompleted((prev) => !prev);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="border-b">
         <div className="container max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-end gap-2">
           <ThemeToggle />
+          <Button
+            variant={isSortedByTime ? "secondary" : "ghost"}
+            size="icon"
+            onClick={handleToggleSort}
+            aria-label="Toggle Sort"
+          >
+            <SortDesc className={isSortedByTime ? "text-primary" : ""} />
+          </Button>
+          <Button
+            variant={isFilteringCompleted ? "secondary" : "ghost"}
+            size="icon"
+            onClick={handleToggleFilter}
+            aria-label="Toggle Filter"
+          >
+            <Filter className={isFilteringCompleted ? "text-primary" : ""} />
+          </Button>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -119,6 +146,8 @@ const Index = () => {
             onDelete={handleDeleteCountdown}
             onEdit={handleEditCountdown}
             onReorder={handleReorderCountdowns}
+            isSortedByTime={isSortedByTime}
+            isFilteringCompleted={isFilteringCompleted}
           />
         </div>
       </main>
