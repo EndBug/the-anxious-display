@@ -108,26 +108,10 @@ const Index = () => {
     setIsFilteringCompleted((prev) => !prev);
   };
 
-  const generateShareableUrl = () => {
-    const countdownsToShare = countdowns.map(({ title, targetDate, description }) => ({
-      title,
-      date: targetDate,
-      description,
-    }));
-    const url = new URL(window.location.href);
-    const encodedCountdowns = btoa(encodeURIComponent(JSON.stringify(countdownsToShare))); // Base64 encode with URI encoding
-    url.searchParams.set("countdowns", encodedCountdowns);
-    return url.toString();
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard!");
-  };
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const countdownsParam = searchParams.get("countdowns");
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const countdownsParam = urlSearchParams.get("countdowns");
 
     if (countdownsParam) {
       try {
@@ -153,7 +137,7 @@ const Index = () => {
         toast.error("Invalid countdowns parameter: "+ error.message);
       }
 
-      searchParams.delete("countdowns");
+      urlSearchParams.delete("countdowns");
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
