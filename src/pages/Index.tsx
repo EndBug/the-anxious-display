@@ -59,7 +59,7 @@ const Index = () => {
               });
             }
           });
-          toast.success("Countdowns added from URL!");
+          toast.success("Countdown" + (decodedCountdowns.length > 1 ? "s" : "") + " added from URL!");
         }
       } catch (error) {
         console.error("Failed to parse countdowns from URL", error);
