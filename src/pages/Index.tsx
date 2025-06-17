@@ -8,9 +8,6 @@ import { Countdown } from "@/types/countdown";
 import { GitHubIcon } from '@/components/icons/github';
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Filter, SortDesc, Share2, Clipboard } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
-import { QRCodeCanvas } from "qrcode.react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import SharingDialog from "@/components/SharingDialog";
 
 const Index = () => {
