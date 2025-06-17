@@ -11,6 +11,7 @@ import { Filter, SortDesc, Share2, Clipboard } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import SharingDialog from "@/components/SharingDialog";
 
 const Index = () => {
   const [countdowns, setCountdowns] = useState<Countdown[]>([]);
@@ -162,53 +163,38 @@ const Index = () => {
       <header className="border-b">
         <div className="container max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-end gap-2">
           <ThemeToggle />
-          <Button
-            variant={isSortedByTime ? "secondary" : "ghost"}
-            size="icon"
-            onClick={handleToggleSort}
-            aria-label="Toggle Sort"
-          >
-            <SortDesc className={isSortedByTime ? "text-primary" : ""} />
-          </Button>
-          <Button
-            variant={isFilteringCompleted ? "secondary" : "ghost"}
-            size="icon"
-            onClick={handleToggleFilter}
-            aria-label="Toggle Filter"
-          >
-            <Filter className={isFilteringCompleted ? "text-primary" : ""} />
-          </Button>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Share Countdowns">
-                <Share2 />
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Share Countdowns</DialogTitle>
-              </DialogHeader>
-              <div className="flex flex-col items-center gap-4">
-                <QRCodeCanvas value={generateShareableUrl()} size={200} />
-                <div className="flex flex-col items-center gap-2">
-                  <input
-                    type="text"
-                    readOnly
-                    value={generateShareableUrl()}
-                    className="w-full p-2 border rounded text-sm text-muted-foreground"
-                  />
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => copyToClipboard(generateShareableUrl())}
-                    aria-label="Copy to Clipboard"
-                  >
-                    <Clipboard />
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={isSortedByTime ? "secondary" : "ghost"}
+                  size="icon"
+                  onClick={handleToggleSort}
+                  aria-label="Toggle Sort"
+                >
+                  <SortDesc className={isSortedByTime ? "text-primary" : ""} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Sort by time</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={isFilteringCompleted ? "secondary" : "ghost"}
+                  size="icon"
+                  onClick={handleToggleFilter}
+                  aria-label="Toggle Filter"
+                >
+                  <Filter className={isFilteringCompleted ? "text-primary" : ""} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Filter completed countdowns</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <SharingDialog 
+            generateShareableUrl={generateShareableUrl} 
+            copyToClipboard={copyToClipboard} 
+          />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
