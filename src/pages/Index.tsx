@@ -19,7 +19,6 @@ const Index = () => {
   const [countdownToEdit, setCountdownToEdit] = useState<Countdown | null>(null);
   const [isSortedByTime, setIsSortedByTime] = useState(false);
   const [isFilteringCompleted, setIsFilteringCompleted] = useState(false);
-  const [searchParams] = useSearchParams();
 
   // Load countdowns from local storage on initial render
   useEffect(() => {
