@@ -7,7 +7,7 @@ import CountdownList from "@/components/CountdownList";
 import { Countdown } from "@/types/countdown";
 import { GitHubIcon } from '@/components/icons/github';
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Filter, SortDesc, Share2, Clipboard } from "lucide-react";
+import { Filter, SortDesc } from "lucide-react";
 import SharingDialog from "@/components/SharingDialog";
 
 const Index = () => {
