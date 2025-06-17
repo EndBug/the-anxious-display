@@ -40,25 +40,41 @@ const Index = () => {
   }, [countdowns]);
 
   // Parse query parameters and add countdown if valid parameters are detected
-  useEffect(() => {
-    const title = searchParams.get("title");
-    const targetDate = searchParams.get("date");
-    const description = searchParams.get("description");
+  const parseCountdownsFromURL = () => {
+    const urlSearchParams = new URLSearchParams(window.location.search);
+    const countdownsParam = urlSearchParams.get("countdowns");
 
-    if (title && targetDate) {
-      const newCountdown = {
-        title,
-        targetDate,
-        description: description || "",
-      };
-      handleAddCountdown(newCountdown);
-      toast.success("Countdown added from URL!");
-      searchParams.delete("title");
-      searchParams.delete("date");
-      searchParams.delete("description");
+    if (countdownsParam) {
+      try {
+        const decodedString = decodeURIComponent(atob(countdownsParam)); // Decode base64 and URI
+        const decodedCountdowns = JSON.parse(decodedString); // Parse JSON
+        if (Array.isArray(decodedCountdowns)) {
+          decodedCountdowns.forEach((countdown) => {
+            const { title, date, description } = countdown;
+            if (title && date) {
+              handleAddCountdown({
+                title,
+                targetDate: date,
+                description: description || "",
+              });
+            }
+          });
+          toast.success("Countdowns added from URL!");
+        }
+      } catch (error) {
+        console.error("Failed to parse countdowns from URL", error);
+        toast.error("Invalid countdowns parameter: "+ error.message);
+      }
+
+      urlSearchParams.delete("countdowns");
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [searchParams]);
+  }
+
+  useEffect(() => {
+    parseCountdownsFromURL();
+  }, []);
+
 
   const generateUUID = () => {
     if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -109,38 +125,7 @@ const Index = () => {
   };
 
 
-  useEffect(() => {
-    const urlSearchParams = new URLSearchParams(window.location.search);
-    const countdownsParam = urlSearchParams.get("countdowns");
 
-    if (countdownsParam) {
-      try {
-        console.log("Raw countdownsParam:", countdownsParam); // Debugging log
-        const decodedString = decodeURIComponent(atob(countdownsParam)); // Decode base64 and URI
-        console.log("Decoded string:", decodedString); // Debugging log
-        const decodedCountdowns = JSON.parse(decodedString); // Parse JSON
-        if (Array.isArray(decodedCountdowns)) {
-          decodedCountdowns.forEach((countdown) => {
-            const { title, date, description } = countdown;
-            if (title && date) {
-              handleAddCountdown({
-                title,
-                targetDate: date,
-                description: description || "",
-              });
-            }
-          });
-          toast.success("Countdowns added from URL!");
-        }
-      } catch (error) {
-        console.error("Failed to parse countdowns from URL", error);
-        toast.error("Invalid countdowns parameter: "+ error.message);
-      }
-
-      urlSearchParams.delete("countdowns");
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
