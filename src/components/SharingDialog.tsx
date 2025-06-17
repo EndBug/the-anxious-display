@@ -5,20 +5,38 @@ import { Button } from "@/components/ui/button";
 import { Clipboard } from "lucide-react";
 import { Share2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Countdown } from "@/types/countdown";
 
 interface SharingDialogProps {
-  generateShareableUrl: () => string;
-  copyToClipboard: (url: string) => void;
+  countdowns: Countdown[];
+    buttonStyleClass?: string; // Optional class for the button styling
 }
 
-const SharingDialog: React.FC<SharingDialogProps> = ({ generateShareableUrl, copyToClipboard }) => {
+const SharingDialog: React.FC<SharingDialogProps> = ({ countdowns, buttonStyleClass}) => {
+  const generateShareableUrl = (): string => {
+    const countdownsToShare = countdowns.map(({ title, targetDate, description }) => ({
+      title,
+      date: targetDate,
+      description,
+    }));
+    const url = new URL(window.location.href);
+    const encodedCountdowns = btoa(encodeURIComponent(JSON.stringify(countdownsToShare))); // Base64 encode with URI encoding
+    url.searchParams.set("countdowns", encodedCountdowns);
+    return url.toString();
+  };
+
+  const copyToClipboard = (url: string): void => {
+    navigator.clipboard.writeText(url);
+    alert("Countdown link copied to clipboard!");
+  };
+
   return (
     <Dialog>
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Share Countdowns">
+              <Button variant="ghost" size="icon" aria-label="Share Countdowns" className={buttonStyleClass}>
                 <Share2 />
               </Button>
             </DialogTrigger>

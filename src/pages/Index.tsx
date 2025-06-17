@@ -192,8 +192,7 @@ const Index = () => {
             </Tooltip>
           </TooltipProvider>
           <SharingDialog 
-            generateShareableUrl={generateShareableUrl} 
-            copyToClipboard={copyToClipboard} 
+            countdowns={countdowns}
           />
           <TooltipProvider>
             <Tooltip>

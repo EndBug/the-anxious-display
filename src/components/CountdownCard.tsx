@@ -5,6 +5,7 @@ import { Countdown } from "@/types/countdown";
 import { calculateTimeRemaining, formatDateTime } from "@/utils/countdownUtils";
 import { Clock, Trash2, Edit2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import SharingDialog from "./SharingDialog";
 
 interface CountdownCardProps {
   countdown: Countdown;
@@ -70,6 +71,7 @@ const CountdownCard: React.FC<CountdownCardProps> = ({ countdown, onDelete, onEd
             >
               <Trash2 size={18} />
             </Button>
+            <SharingDialog countdowns={[countdown]} buttonStyleClass={cn("h-8 w-8", isColored ? "text-white/80 hover:text-white" : "text-muted-foreground hover:text-primary")} />
           </div>
         </div>
       </CardHeader>
