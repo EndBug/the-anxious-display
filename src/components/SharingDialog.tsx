@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { QRCodeCanvas } from "qrcode.react";
 import { Button } from "@/components/ui/button";
-import { Clipboard } from "lucide-react";
+import { Clipboard, Check } from "lucide-react";
 import { Share2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Countdown } from "@/types/countdown";
@@ -13,6 +13,8 @@ interface SharingDialogProps {
 }
 
 const SharingDialog: React.FC<SharingDialogProps> = ({ countdowns, buttonStyleClass}) => {
+  const [copied, setCopied] = useState(false);
+
   const generateShareableUrl = (): string => {
     const countdownsToShare = countdowns.map(({ title, targetDate, description }) => ({
       title,
@@ -25,9 +27,15 @@ const SharingDialog: React.FC<SharingDialogProps> = ({ countdowns, buttonStyleCl
     return url.toString();
   };
 
-  const copyToClipboard = (url: string): void => {
-    navigator.clipboard.writeText(url);
-    alert("Countdown link copied to clipboard!");
+  const copyToClipboard = async (url: string): Promise<void> => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      // Reset the copied state after 2 seconds
+      setTimeout(() => setCopied(false), 1000);
+    } catch (error) {
+      console.error(">>> Failed to copy to clipboard:", error);
+    }
   };
 
   return (
@@ -58,12 +66,13 @@ const SharingDialog: React.FC<SharingDialogProps> = ({ countdowns, buttonStyleCl
               className="flex-1 p-2 border rounded text-sm text-muted-foreground"
             />
             <Button
-              variant="ghost"
+              variant={copied ? "default" : "ghost"}
               size="icon"
               onClick={() => copyToClipboard(generateShareableUrl())}
               aria-label="Copy to Clipboard"
+              className={copied ? "bg-green-600 hover:bg-green-700 text-white" : ""}
             >
-              <Clipboard />
+              {copied ? <Check className="h-5 w-5" /> : <Clipboard className="h-4 w-4" />}
             </Button>
           </div>
         </div>
