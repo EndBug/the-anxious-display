@@ -5,6 +5,8 @@ import { Countdown } from "@/types/countdown";
 import { calculateTimeRemaining, formatDateTime } from "@/utils/countdownUtils";
 import { Clock, Trash2, Edit2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import SharingDialog from "./SharingDialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CountdownCardProps {
   countdown: Countdown;
@@ -16,6 +18,7 @@ const CountdownCard: React.FC<CountdownCardProps> = ({ countdown, onDelete, onEd
   const [timeRemaining, setTimeRemaining] = useState(
     calculateTimeRemaining(countdown.targetDate)
   );
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -38,7 +41,11 @@ const CountdownCard: React.FC<CountdownCardProps> = ({ countdown, onDelete, onEd
   const isColored = days < 7 && !isExpired;
 
   return (
-    <Card className={cn("h-full", getCardClasses())}>
+    <Card 
+      className={cn("h-full", getCardClasses())}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div>
@@ -53,23 +60,36 @@ const CountdownCard: React.FC<CountdownCardProps> = ({ countdown, onDelete, onEd
               </p>
             )}
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onEdit(countdown)}
-              className={cn("h-8 w-8", isColored ? "text-white/80 hover:text-white" : "text-muted-foreground hover:text-primary")}
-            >
-              <Edit2 size={18} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onDelete(countdown.id)}
-              className={cn("h-8 w-8", isColored ? "text-white/80 hover:text-white" : "text-muted-foreground hover:text-destructive")}
-            >
-              <Trash2 size={18} />
-            </Button>
+          <div className={cn("flex gap-2 transition-all duration-200", 
+            isHovered ? "opacity-100" : "opacity-0"
+          )}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onEdit(countdown)}
+                  className={cn("h-8 w-8", isColored ? "text-white/80 hover:text-white" : "text-muted-foreground hover:text-primary")}
+                >
+                  <Edit2 size={18} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Edit countdown</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onDelete(countdown.id)}
+                  className={cn("h-8 w-8", isColored ? "text-white/80 hover:text-white" : "text-muted-foreground hover:text-destructive")}
+                >
+                  <Trash2 size={18} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Delete countdown</TooltipContent>
+            </Tooltip>
+            <SharingDialog countdowns={[countdown]} buttonStyleClass={cn("h-8 w-8", isColored ? "text-white/80 hover:text-white" : "text-muted-foreground hover:text-primary")} />
           </div>
         </div>
       </CardHeader>

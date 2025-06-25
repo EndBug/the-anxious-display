@@ -28,6 +28,8 @@ interface CountdownListProps {
   onDelete: (id: string) => void;
   onEdit: (countdown: Countdown) => void;
   onReorder: (countdowns: Countdown[]) => void;
+  isSortedByTime: boolean;
+  isFilteringCompleted: boolean;
 }
 
 // Sortable wrapper for CountdownCard
@@ -75,14 +77,27 @@ const SortableCountdownCard = ({ countdown, onDelete, onEdit }: {
   );
 };
 
-const CountdownList: React.FC<CountdownListProps> = ({ countdowns, onDelete, onEdit, onReorder }) => {
+const CountdownList: React.FC<CountdownListProps> = ({ countdowns, onDelete, onEdit, onReorder, isSortedByTime, isFilteringCompleted }) => {
   const [activeId, setActiveId] = React.useState<string | null>(null);
   const [items, setItems] = React.useState(countdowns);
   
   // Update items when countdowns prop changes
   React.useEffect(() => {
-    setItems(countdowns);
-  }, [countdowns]);
+    let updatedItems = countdowns.map(item => ({
+      ...item,
+      remainingTime: new Date(item.targetDate).getTime() - Date.now(),
+    }));
+
+    if (isFilteringCompleted) {
+      updatedItems = updatedItems.filter(item => item.remainingTime && item.remainingTime > 0);
+    }
+
+    if (isSortedByTime) {
+      updatedItems.sort((a, b) => (a.remainingTime || 0) - (b.remainingTime || 0));
+    }
+
+    setItems(updatedItems);
+  }, [countdowns, isFilteringCompleted, isSortedByTime]);
   
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
