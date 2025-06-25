@@ -41,12 +41,12 @@ const SharingDialog: React.FC<SharingDialogProps> = ({ countdowns, buttonStyleCl
               </Button>
             </DialogTrigger>
           </TooltipTrigger>
-          <TooltipContent>Share countdowns</TooltipContent>
+          <TooltipContent>Share {countdowns.length === 1 ? 'countdown' : 'countdowns'}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Share Countdowns</DialogTitle>
+          <DialogTitle>Share {countdowns.length === 1 ? 'Countdown' : 'Countdowns'}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center gap-4">
           <QRCodeCanvas value={generateShareableUrl()} size={200} />
