@@ -26,7 +26,7 @@ const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
   date: z.date({
-    required_error: "Date is required"
+    error: "Date is required"
   }),
   time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, {
     message: "Please enter a valid time in the format HH:MM"
